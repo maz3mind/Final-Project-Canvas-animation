@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+<title>Responsive Interactive Canvas</title>
+<script>
+	  var canvas;
+	  var context;
+	  var timer;
+	  var shapes = [];
+	  function Shape(x, y, color) {
+		this.x = canvas.width/2;
+		this.y = canvas.height/2;
+		this.dx = Math.random()*10-5;
+		this.dy = Math.random()*10-5;
+		this.color = color;
+		//this.shape = possibleShapes[Math.floor(Math.random()*possibleShapes.length)];
+	  }
+      function init() {
+        canvas = document.getElementById('canvas');
+        context = canvas.getContext("2d");
+ 
+        window.addEventListener('resize', resizeCanvas, false);
+        window.addEventListener('orientationchange', resizeCanvas, false);
+        resizeCanvas();
+		canvas.onclick = function(event) {
+			handleClick(event.clientX, event.clientY);
+		};
+		timer = setInterval(resizeCanvas, 50);
+      }
+	  function handleClick(x, y) {
+	     var found = false;
+		 for (var i=0; i<shapes.length; i++) {
+			d = Math.sqrt((shapes[i].x - x)*(shapes[i].x - x) + (shapes[i].y - y)*(shapes[i].y - y));
+			if (d <= 10) {
+				shapes.splice(i, 3);
+				found = true;
+				found = true;
+			}
+		 }
+		 fillBackgroundColor(x, y);
+		 if (!found) {
+			var colors = ["rgb(255,137,97)", "rgb(136,255,97)", "rgb(97,215,255)", "rgb(255,187,97)", "rgb(216,97,255)", "rgb(255,252,97)"];
+			var color = colors[Math.floor(Math.random()*colors.length)];
+			shapes.push(new Shape(x, y, color));
+		}
+		for (var i=0; i<shapes.length; i++) {
+			drawShapes(shapes[i]);
+		}
+	  }
+	  
+	  function drawShapes(x, y, color) {
+	   var numbers = ['circle','square'];
+	   var number = numbers[Math.floor(Math.random()*numbers.length)];
+	   
+	   if (number == 'circle'){
+		drawCircle(x, y);
+	   }
+	   else if (number == 'square'){
+	    drawSquare(x, y);
+	  }
+	  }
+	  function drawCircle(circle) {
+		 context.beginPath();
+		 context.arc(circle.x, circle.y, 30, 0, degreesToRadians(360), true);
+		 context.fillStyle = circle.color;
+		 context.fill();
+		 if (circle.x + circle.dx > canvas.width || circle.x + circle.dx < 0)
+			circle.dx = -circle.dx;
+		 if (circle.y + circle.dy > canvas.height || circle.y + circle.dy < 0)
+			circle.dy = -circle.dy;
+		 circle.x += circle.dx;
+		 circle.y += circle.dy;
+	  }
+	  
+	   function drawSquare(square) {
+		context.beginPath();
+		context.fillStyle = square.color;
+		context.fillRect(square.x, square.y, 30, 30);
+		 if (square.x + square.dx > canvas.width || square.x + square.dx < 0)
+			square.dx = -square.dx;
+		 if (square.y + square.dy > canvas.height || square.y + square.dy < 0)
+			square.dy = -square.dy;
+		 square.x += square.dx;
+		 square.y += square.dy;
+		 
+	  }
+		
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+		fillBackgroundColor();
+		for (var i=0; i<shapes.length; i++) {
+			drawShapes(shapes[i]);
+		 }
+      }
+	  function fillBackgroundColor() {
+		 //var colors = ["white", "yellow", "blue", "red"];
+		 //var bgColor = colors[Math.floor(Math.random() * colors.length)];
+		 context.fillStyle = 'black';
+		 context.fillRect(0, 0, canvas.width, canvas.height);
+	}
+	function degreesToRadians(degrees) {
+		//converts from degrees to radians and returns
+		return (degrees * Math.PI)/180;
+	}
+	window.onload = init;
+</script>
+</head>
+<body>
+<canvas id='canvas' width=500 height=500></canvas>
+</body>	  

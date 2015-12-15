@@ -7,13 +7,14 @@
 	  var context;
 	  var timer;
 	  var shapes = [];
+	  var possibleShapes = ['circle','square']
 	  function Shape(x, y, color) {
-		this.x = canvas.width/2;
-		this.y = canvas.height/2;
+		this.x = x;
+		this.y = y;
 		this.dx = Math.random()*10-5;
 		this.dy = Math.random()*10-5;
 		this.color = color;
-		//this.shape = possibleShapes[Math.floor(Math.random()*possibleShapes.length)];
+		this.shape = drawShapes[Math.floor(Math.random()*drawShapes.length)];
 	  }
       function init() {
         canvas = document.getElementById('canvas');
@@ -25,16 +26,16 @@
 		canvas.onclick = function(event) {
 			handleClick(event.clientX, event.clientY);
 		};
-		timer = setInterval(resizeCanvas, 50);
+		timer = setInterval(resizeCanvas, 20);
       }
-	  function handleClick(x, y) {
+	  function handleClick(x, y, color) {
 	     var found = false;
 		 for (var i=0; i<shapes.length; i++) {
 			d = Math.sqrt((shapes[i].x - x)*(shapes[i].x - x) + (shapes[i].y - y)*(shapes[i].y - y));
-			if (d <= 10) {
-				shapes.splice(i, 3);
+			if (d <= 20) {
+				shapes.splice(i, 10);
 				found = true;
-				found = true;
+				
 			}
 		 }
 		 fillBackgroundColor(x, y);
@@ -51,19 +52,23 @@
 	  function drawShapes(x, y, color) {
 	   var numbers = ['circle','square'];
 	   var number = numbers[Math.floor(Math.random()*numbers.length)];
-	   
 	   if (number == 'circle'){
 		drawCircle(x, y);
 	   }
 	   else if (number == 'square'){
 	    drawSquare(x, y);
-	  }
+	   }
+	   else if (number == 'triangle'){
+	    drawTriangle(x, y); 
+	   }
 	  }
 	  function drawCircle(circle) {
 		 context.beginPath();
 		 context.arc(circle.x, circle.y, 30, 0, degreesToRadians(360), true);
 		 context.fillStyle = circle.color;
 		 context.fill();
+		 context.globalCompositeOperation = 'source-in';
+		 context.globalCompositeOperation = 'lighter'; 
 		 if (circle.x + circle.dx > canvas.width || circle.x + circle.dx < 0)
 			circle.dx = -circle.dx;
 		 if (circle.y + circle.dy > canvas.height || circle.y + circle.dy < 0)
@@ -76,6 +81,8 @@
 		context.beginPath();
 		context.fillStyle = square.color;
 		context.fillRect(square.x, square.y, 30, 30);
+		context.globalCompositeOperation = 'source-in';
+		context.globalCompositeOperation = 'lighter'; 
 		 if (square.x + square.dx > canvas.width || square.x + square.dx < 0)
 			square.dx = -square.dx;
 		 if (square.y + square.dy > canvas.height || square.y + square.dy < 0)
@@ -84,6 +91,24 @@
 		 square.y += square.dy;
 		 
 	  }
+	  	  function drawTriangle(triangle){
+		context.beginPath();
+		context.moveTo(triangle.x, triangle.y);
+		context.lineTo(triangle.x+75, triangle.y+100);
+		context.lineTo(triangle.x-75, triangle.y+100);
+		context.closePath();
+		context.fillStyle = triangle.color;
+		context.fill();
+		context.globalCompositeOperation = 'source-in';
+		context.globalCompositeOperation = 'lighter'; 
+		}
+		
+		function drawText() {
+			context.fillStyle = 'white';
+			context.font = 'bold 2em sans-serif';
+			context.textAlign = 'right';
+			context.fillText('Click anywhere', canvas.width/2, canvas.height/2);
+		}
 		
       function resizeCanvas() {
         canvas.width = window.innerWidth;
@@ -92,11 +117,12 @@
 		for (var i=0; i<shapes.length; i++) {
 			drawShapes(shapes[i]);
 		 }
+		 drawText();
       }
 	  function fillBackgroundColor() {
 		 //var colors = ["white", "yellow", "blue", "red"];
 		 //var bgColor = colors[Math.floor(Math.random() * colors.length)];
-		 context.fillStyle = 'black';
+		 context.fillStyle = '#ff4d4d';
 		 context.fillRect(0, 0, canvas.width, canvas.height);
 	}
 	function degreesToRadians(degrees) {
